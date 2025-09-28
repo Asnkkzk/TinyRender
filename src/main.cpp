@@ -3,9 +3,10 @@
 #include "geometry.h"
 #include "model.h"
 #include "tgaimage.h"
+using namespace std;
 
-constexpr int width  = 800;
-constexpr int height = 800;
+constexpr int width  = 300;
+constexpr int height = 300;
 
 constexpr TGAColor white   = {255, 255, 255, 255}; // attention, BGRA order
 constexpr TGAColor green   = {  0, 255,   0, 255};
@@ -37,37 +38,44 @@ void line(int ax, int ay, int bx, int by, TGAImage &framebuffer, TGAColor color)
         }
     }
 }
+int sign(int ax,int ay,int bx,int by,int cx,int cy){
+    int ans=(bx-ax)*(cy-by)-(cx-bx)*(by-ay);
+    if(ans>0) return 1;
+    else return -1;
+}
+void TriangleRasterization(int ax,int ay,int bx,int by,int cx,int cy,TGAImage &framebuffer){
+    line(ax,ay,bx,by,framebuffer,red);
+    line(ax,ay,cx,cy,framebuffer,green);
+    line(bx,by,cx,cy,framebuffer,blue);
+    int xmin=min(ax,min(bx,cx));
+    int xmax=max(ax,max(bx,cx));
+    int ymin=min(ay,min(by,cy));
+    int ymax=max(ay,max(by,cy));
+    int signA=sign(ax,ay, bx, by, cx, cy);
+    cout<<signA<<endl;
+    TGAColor rnd;
 
-std::tuple<int,int> project(vec3 v) { // First of all, (x,y) is an orthogonal projection of the vector (x,y,z).
-    return { (v.x + 1.) *  width/2,   // Second, since the input models are scaled to have fit in the [-1,1]^3 world coordinates,
-             (v.y + 1.) * height/2 }; // we want to shift the vector (x,y) and then scale it to span the entire screen.
+    for(int i=xmin;i<=xmax;i++){
+        for(int j=ymin;j<=ymax;j++){
+             int alpha=sign(i,j,bx,by,cx,cy)/signA;
+             int beta=sign(i,j,cx,cy,ax,ay)/signA;
+             int gamma=sign(i,j,ax,ay,bx,by)/signA;
+            if(alpha+beta+gamma!=3) continue;
+            for (int c=0; c<3; c++) rnd[c] = std::rand()%255;
+            framebuffer.set(i,j,rnd);
+        }
+    }
+
 }
 
+
 int main(int argc, char** argv) {
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " obj/model.obj" << std::endl;
-        // src/main.exe obj\diablo3_pose\diablo3_pose.obj
-        return 1;
-    }
 
-    Model model(argv[1]);
     TGAImage framebuffer(width, height, TGAImage::RGB);
-
-    for (int i=0; i<model.nfaces(); i++) { // iterate through all triangles
-        auto [ax, ay] = project(model.vert(i, 0));
-        auto [bx, by] = project(model.vert(i, 1));
-        auto [cx, cy] = project(model.vert(i, 2));
-        line(ax, ay, bx, by, framebuffer, red);
-        line(bx, by, cx, cy, framebuffer, red);
-        line(cx, cy, ax, ay, framebuffer, red);
-    }
-
-    for (int i=0; i<model.nverts(); i++) { // iterate through all vertices
-        vec3 v = model.vert(i);            // get i-th vertex
-        auto [x, y] = project(v);          // project it to the screen
-        framebuffer.set(x, y, white);
-    }
     
-    framebuffer.write_tga_file("./output/framebuffer1.tga");
+    int ax=0,ay=0,bx=50,by=280,cx=260,cy=70;
+    TriangleRasterization(ax,ay,bx,by,cx,cy,framebuffer);
+
+    framebuffer.write_tga_file("framebuffer.tga");
     return 0;
 }
