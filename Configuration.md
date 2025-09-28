@@ -1,4 +1,4 @@
-1. task.json是编译配置，在command一栏gcc用于编译C，g++用于编译C++.在args的{files}配置项里，应填入会用到的.cpp文件，包括引用的.h对应的.cpp和main.cpp
+1. tasks.json是编译配置，在command一栏gcc用于编译C，g++用于编译C++.在args的{files}配置项里，应填入会用到的.cpp文件，包括引用的.h对应的.cpp和main.cpp
 
    ```json
    {
