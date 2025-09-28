@@ -7,7 +7,11 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "E:\\tinyrender\\main.cpp", "E:\\tinyrender\\TGAImage.cpp",//用于编译的cpp  
+                "-I",
+                "${workspaceFolder}/bresenham/include",  // 更新头文件路径
+                "${workspaceFolder}/bresenham/src/main.cpp",
+                "${workspaceFolder}/bresenham/src/tgaimage.cpp",
+                "${workspaceFolder}/bresenham/src/model.cpp",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe"
             ],
