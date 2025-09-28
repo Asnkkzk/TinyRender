@@ -68,6 +68,6 @@ int main(int argc, char** argv) {
         framebuffer.set(x, y, white);
     }
     
-    framebuffer.write_tga_file("./output/framebuffer1.tga");
+    framebuffer.write_tga_file("framebuffer1.tga");
     return 0;
 }
