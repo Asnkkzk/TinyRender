@@ -8,10 +8,10 @@
                 "-fdiagnostics-color=always",
                 "-g",
                 "-I",
-                "${workspaceFolder}/bresenham/include",  // 更新头文件路径
-                "${workspaceFolder}/bresenham/src/main.cpp",
-                "${workspaceFolder}/bresenham/src/tgaimage.cpp",
-                "${workspaceFolder}/bresenham/src/model.cpp",
+                "${workspaceFolder}/include",  // 更新头文件路径
+                "${workspaceFolder}/src/main.cpp",
+                "${workspaceFolder}/src/tgaimage.cpp",
+                "${workspaceFolder}/src/model.cpp",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe"
             ],
