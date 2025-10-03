@@ -66,6 +66,7 @@ void TriangleRasterization(int ax,int ay,int az,int bx,int by,int bz,int cx,int 
              double gamma=sign(i,j,ax,ay,bx,by)/signA;
             if(alpha<0||beta<0||gamma<0) continue;//任意一个小于0，代表此像素点在三角形外，不去渲染.
             unsigned char z=static_cast<unsigned char>(alpha*az+beta*bz+gamma*cz);
+            if (z <= zbuffer.get(i, j)[0]) continue;
             zbuffer.set(i,j,{z});
             framebuffer.set(i,j,color);
         }
