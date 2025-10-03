@@ -11,7 +11,7 @@ constexpr int height = 300;
 constexpr TGAColor white   = {255, 255, 255, 255}; // attention, BGRA order
 constexpr TGAColor green   = {  0, 255,   0, 255};
 constexpr TGAColor red     = {  0,   0, 255, 255};
-constexpr TGAColor blue    = {255, 128,  64, 255};
+constexpr TGAColor blue    = {255,   0,   0, 255};
 constexpr TGAColor yellow  = {  0, 200, 255, 255};
 
 void line(int ax, int ay, int bx, int by, TGAImage &framebuffer, TGAColor color) {
@@ -38,31 +38,33 @@ void line(int ax, int ay, int bx, int by, TGAImage &framebuffer, TGAColor color)
         }
     }
 }
-int sign(int ax,int ay,int bx,int by,int cx,int cy){
-    int ans=(bx-ax)*(cy-by)-(cx-bx)*(by-ay);
-    if(ans>0) return 1;
-    else return -1;
+double sign(int ax,int ay,int bx,int by,int cx,int cy){
+    return .5*((bx-ax)*(cy-by)-(cx-bx)*(by-ay));
 }
 void TriangleRasterization(int ax,int ay,int bx,int by,int cx,int cy,TGAImage &framebuffer){
-    line(ax,ay,bx,by,framebuffer,red);
-    line(ax,ay,cx,cy,framebuffer,green);
-    line(bx,by,cx,cy,framebuffer,blue);
+    //line(ax,ay,bx,by,framebuffer,red);
+    //line(ax,ay,cx,cy,framebuffer,green);
+    //line(bx,by,cx,cy,framebuffer,blue);
     int xmin=min(ax,min(bx,cx));
     int xmax=max(ax,max(bx,cx));
     int ymin=min(ay,min(by,cy));
     int ymax=max(ay,max(by,cy));
-    int signA=sign(ax,ay, bx, by, cx, cy);
+    double signA=sign(ax,ay, bx, by, cx, cy);
     cout<<signA<<endl;
-    TGAColor rnd;
+    //if(signA<0) return;
 
     for(int i=xmin;i<=xmax;i++){
         for(int j=ymin;j<=ymax;j++){
-             int alpha=sign(i,j,bx,by,cx,cy)/signA;
-             int beta=sign(i,j,cx,cy,ax,ay)/signA;
-             int gamma=sign(i,j,ax,ay,bx,by)/signA;
-            if(alpha+beta+gamma!=3) continue;
-            for (int c=0; c<3; c++) rnd[c] = std::rand()%255;
-            framebuffer.set(i,j,rnd);
+             double alpha=sign(i,j,bx,by,cx,cy)/signA;
+             double beta=sign(i,j,cx,cy,ax,ay)/signA;
+             double gamma=sign(i,j,ax,ay,bx,by)/signA;
+            if(alpha<0||beta<0||gamma<0) continue;
+
+            unsigned char b=static_cast<unsigned char>(alpha*blue[0]+beta*green[0]+gamma*red[0]);
+            unsigned char g=static_cast<unsigned char>(alpha*blue[1]+beta*green[1]+gamma*red[1]);
+            unsigned char r=static_cast<unsigned char>(alpha*blue[2]+beta*green[2]+gamma*red[2]);    
+            
+            framebuffer.set(i,j,{b,g,r,255});
         }
     }
 
@@ -73,9 +75,9 @@ int main(int argc, char** argv) {
 
     TGAImage framebuffer(width, height, TGAImage::RGB);
     
-    int ax=0,ay=0,bx=50,by=280,cx=260,cy=70;
+    int ax=0,ay=0,cx=50,cy=280,bx=260,by=70;
     TriangleRasterization(ax,ay,bx,by,cx,cy,framebuffer);
 
-    framebuffer.write_tga_file("framebuffer.tga");
+    framebuffer.write_tga_file("framebuffer1.tga");
     return 0;
 }
